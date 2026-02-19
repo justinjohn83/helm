@@ -151,7 +151,7 @@ def get_clear_spec(condition: str, data_path: str) -> RunSpec:
         input_noun=None,
         output_noun="Respond only with 'A', 'B', or 'C'. Do not add any other text, punctuation, or symbols",
         max_train_instances=0,
-        max_tokens=1,
+        max_tokens=2048,
     )
 
     return RunSpec(
@@ -288,7 +288,7 @@ def get_ehrshot_spec(subject: str, data_path: str, max_length: int = 100000) -> 
         input_noun="",
         output_noun="Respond with only 'A' for yes or 'B' for no. Do not add any other text, punctuation, or symbols",
         max_train_instances=0,
-        max_tokens=1,
+        max_tokens=2048,
     )
 
     return RunSpec(
@@ -324,7 +324,7 @@ def get_head_qa_run_spec(language: str = "en", category: Union[str, None] = None
         ),
         input_noun="Question",
         output_noun="Answer",
-        max_tokens=1,
+        max_tokens=2048,
         max_train_instances=0,
     )
 
@@ -364,7 +364,7 @@ def get_medbullets_run_spec() -> RunSpec:
         ),
         input_noun="Clinical Scenario",
         output_noun="Answer",
-        max_tokens=1,
+        max_tokens=2048,
         max_train_instances=0,
     )
 
@@ -390,7 +390,7 @@ def get_medhelm_med_qa_spec() -> RunSpec:
         instructions="Give a letter answer among A, B, C or D. Do not include any explanation or additional text.",
         input_noun="Question",
         output_noun="Respond only with 'A', 'B', 'C' or 'D'. Do not add any other text, punctuation, or symbols.",
-        max_tokens=1,
+        max_tokens=2048,
         max_train_instances=0,
     )
 
@@ -412,7 +412,7 @@ def get_medhelm_med_mcqa_spec() -> RunSpec:
         instructions="Give a letter answer among A, B, C or D. Do not include any explanation or additional text.",
         input_noun="Question",
         output_noun="Respond only with 'A', 'B', 'C' or 'D'. Do not add any other text, punctuation, or symbols.",
-        max_tokens=1,
+        max_tokens=2048,
         max_train_instances=0,
     )
 
