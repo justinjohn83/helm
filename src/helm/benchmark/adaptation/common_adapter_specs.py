@@ -24,7 +24,7 @@ def get_multiple_choice_joint_adapter_spec(
     output_noun: str,
     num_outputs: int = 5,
     max_train_instances: int = 5,
-    max_tokens: int = 5,
+    max_tokens: int = 2048,
     sample_train: bool = True,
     **kwargs,
 ) -> AdapterSpec:
@@ -72,7 +72,7 @@ def get_multiple_choice_joint_chain_of_thought_adapter_spec(
     output_noun: str,
     num_outputs: int = 5,
     max_train_instances: int = 5,
-    max_tokens: int = 5,
+    max_tokens: int = 2048,
     sample_train: bool = True,
     **kwargs,
 ) -> AdapterSpec:
@@ -144,7 +144,7 @@ def get_multiple_choice_adapter_spec(
     output_noun: str,
     max_train_instances: int = 5,
     num_outputs: int = 5,
-    max_tokens: int = 1,
+    max_tokens: int = 2048,
     empty_input: bool = False,
     sample_train: bool = True,
     **kwargs,
@@ -190,7 +190,7 @@ def get_ranking_binary_adapter_spec(
     num_outputs: int = 1,
     num_train_trials: int = 1,
     temperature: float = 0.0,
-    max_tokens: int = 5,
+    max_tokens: int = 2048,
     **kwargs,
 ) -> AdapterSpec:
     """
@@ -281,7 +281,7 @@ def get_generation_adapter_spec(
     newline_after_output_noun: bool = False,
     max_train_instances: int = 5,
     num_outputs: int = 1,
-    max_tokens: int = 5,
+    max_tokens: int = 2048,
     stop_sequences: Optional[List] = None,  # default value of `stop_sequences` is ["\n"]
     temperature: float = 0.0,
     multi_label: bool = False,

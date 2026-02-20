@@ -266,6 +266,11 @@ class OpenAIClient(CachingClient):
             "max_tokens": request.max_tokens,
             "presence_penalty": request.presence_penalty,
             "frequency_penalty": request.frequency_penalty,
+            # Request logprobs from OpenAI-compatible backends that support them
+            # (e.g., Ollama, vLLM). Backends that don't support logprobs will
+            # ignore these fields or return logprobs: null in the response.
+            "logprobs": True,
+            "top_logprobs": request.top_k_per_token if request.top_k_per_token else 1,
         }
 
         if request.response_format and request.response_format.json_schema:
@@ -370,14 +375,30 @@ class OpenAIClient(CachingClient):
             if self.output_processor:
                 raw_completion_content = self.output_processor(raw_completion_content)
             text: str = request.prompt + raw_completion_content if request.echo_prompt else raw_completion_content
-            # The OpenAI chat completion API doesn't return us tokens or logprobs, so we tokenize ourselves.
-            tokenization_result: TokenizationRequestResult = self.tokenizer.tokenize(
-                TokenizationRequest(text, tokenizer=self.tokenizer_name)
-            )
-            # Log probs are not currently not supported by the OpenAI chat completion API, so set to 0 for now.
-            tokens: List[Token] = [
-                Token(text=cast(str, raw_token), logprob=0) for raw_token in tokenization_result.raw_tokens
-            ]
+
+            # Try to extract logprobs from the response (supported by Ollama, vLLM, etc.)
+            # Fall back to local tokenization with logprob=0 if not available.
+            response_logprobs = raw_completion.get("logprobs")
+            if response_logprobs and response_logprobs.get("content"):
+                # Parse per-token logprobs from OpenAI-compatible response format
+                logprob_content = response_logprobs["content"]
+                tokens: List[Token] = [
+                    Token(
+                        text=token_info["token"],
+                        logprob=token_info.get("logprob", 0),
+                    )
+                    for token_info in logprob_content
+                ]
+                completion_logprob = sum(t.logprob for t in tokens)
+            else:
+                # No logprobs available — tokenize locally and set logprob=0
+                tokenization_result: TokenizationRequestResult = self.tokenizer.tokenize(
+                    TokenizationRequest(text, tokenizer=self.tokenizer_name)
+                )
+                tokens = [
+                    Token(text=cast(str, raw_token), logprob=0) for raw_token in tokenization_result.raw_tokens
+                ]
+                completion_logprob = 0
             # vLLM has a optional `reasoning_content` field in the message
             # that is not in the standard OpenAI API.
             # This field is also used by some model providers such as Grok.
@@ -388,7 +409,7 @@ class OpenAIClient(CachingClient):
             )
             completion = GeneratedOutput(
                 text=text,
-                logprob=0,  # OpenAI does not provide logprobs
+                logprob=completion_logprob,
                 tokens=tokens,
                 finish_reason={"reason": raw_completion["finish_reason"]},
                 thinking=thinking,
