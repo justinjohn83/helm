@@ -85,6 +85,14 @@ class BenchmarkConfig:
             if metric.name == "exact_match":
                 metric_specs.extend(get_exact_match_metric_specs())
 
+            elif metric.name == "code_set_f1":
+                metric_specs.append(
+                    MetricSpec(
+                        class_name="helm.benchmark.metrics.medhelm.code_set_metrics.CodeSetMetric",
+                        args={"delimiter": ", "},
+                    )
+                )
+
             elif metric.name == "jury_score":
                 if not isinstance(metric, JuryMetricConfig):
                     raise AssertionError("Metric 'jury_score' must be a JuryMetricConfig")

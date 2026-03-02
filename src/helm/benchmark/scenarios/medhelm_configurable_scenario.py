@@ -75,7 +75,17 @@ class MedHELMConfigurableScenario(Scenario):
         for _, row in df.iterrows():
             filled = self.populate_template(template, row, fields)
             prompt = Input(text=filled)
-            instances.append(Instance(input=prompt, references=self.get_references(row), split=TEST_SPLIT))
+            sub_split = row.get("category", None) if "category" in row else None
+            if pd.isna(sub_split):
+                sub_split = None
+            instances.append(
+                Instance(
+                    input=prompt,
+                    references=self.get_references(row),
+                    split=TEST_SPLIT,
+                    sub_split=sub_split,
+                )
+            )
         return instances
 
     def get_metadata(self):
